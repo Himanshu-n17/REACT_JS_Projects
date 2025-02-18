@@ -1,45 +1,54 @@
 import React, { useState } from "react";
 import "./Style.css";
 
-function generateId() {
-  return Math.floor(Math.random() * 1000);
-}
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState("");
 
-function Todolist() {
-  const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState("");
-
-  const handleSubmit = () => {
-    setTodos((todos) =>
-      todos.concat({
-        text: input,
-        id: generateId(),
-      })
-    );
-    setInput("");
+  const addTask = () => {
+    if (newTask.trim()) {
+      const newTaskObject = { id: Date.now(), text: newTask, completed: false };
+      setTasks([...tasks, newTaskObject]);
+      setNewTask("");
+    }
   };
 
-  const removeTodo = (id) =>
-    setTodos((todos) => todos.filter((t) => t.id !== id));
+  const toggleTaskCompletion = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const removeTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
 
   return (
-    <div className="container">
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="new Todo"
-      />
+    <div className="App">
+      <h1>To-Do List</h1>
 
-      <button onClick={handleSubmit}>Submit</button>
+      <div className="input-container">
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Add a new task"
+        />
+        <button onClick={addTask}>Add Task</button>
+      </div>
 
-      <ul className="todos-list">
-        {todos.map(({ text, id }) => (
-          <li key={id} className="todo">
-            <span>{text}</span>
-            <button className="close" onClick={() => removeTodo(id)}>
-              X
-            </button>
+      <ul className="task-list">
+        {tasks.map((task) => (
+          <li key={task.id} className={task.completed ? "completed" : ""}>
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => toggleTaskCompletion(task.id)}
+            />
+            {task.text}
+            <button onClick={() => removeTask(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
@@ -47,4 +56,4 @@ function Todolist() {
   );
 }
 
-export default Todolist;
+export default App;
